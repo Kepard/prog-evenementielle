@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html  lang="en">
+  <head profile="http://www.w3.org/2005/10/profile">
+    <title>Chat Javascript</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="padiflac_runtime.js"></script>
+    
+  </head>
+  <body>
+
+    <script>
+
+        let connection = Padiflac.connect("u32105999ChatSalon");
+
+        var salon = document.createElement("input");
+        document.body.appendChild(salon);
+        salon.insertAdjacentHTML('beforebegin',"Salon: ");
+        salon.value = localStorage.getItem("Salon") || "u32105999";
+        salon.onchange = function() {
+        localStorage.setItem("Salon", salon.value);
+        };
+
+        var chatDiv = document.createElement("ul");
+        document.body.appendChild(chatDiv);
+
+        var pseudo = document.createElement("input");
+        document.body.appendChild(pseudo);
+        pseudo.insertAdjacentHTML('beforebegin',"Pseudo: ");
+        pseudo.value = localStorage.getItem("Pseudo") || "";
+        pseudo.onchange = function() {
+        localStorage.setItem("Pseudo", pseudo.value);
+        };
+
+        var input = document.createElement("input");
+        document.body.appendChild(input);
+        input.insertAdjacentHTML('beforebegin',"Chat: ");
+        input.onchange = function(){
+          let v = input.value;
+          connection.send("(" + salon.value + ")" + "[" + pseudo.value + "]" + v);
+        };
+
+
+        connection.eventloop(function(v) {
+          // Extract the salon name from the message
+          let messageSalon = v.substring(v.indexOf("(")+1, v.indexOf(")"));
+  
+          // Only display the message if it's for the selected salon
+          if (messageSalon === salon.value) {
+            chatDiv.innerHTML = chatDiv.innerHTML + "<li>"+v+"</li>";
+          }
+        });
+    </script>
+  </body>
+</html>

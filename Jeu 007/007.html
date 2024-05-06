@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>007 Game</title>
+</head>
+<body>
+    <h1>007 Game</h1>
+    <div id="playerInfo"></div>
+    <div id="gameResult"></div>
+    <div>
+        <label for="action">Choisissez une action :</label>
+        <select id="action">
+            <option value="0">Se protéger</option>
+            <option value="1">Tirer</option>
+            <option value="2">Recharger</option>
+        </select>
+        <button onclick="playTurn()">Jouer</button>
+    </div>
+    <button onclick="resetGame()">Réinitialiser le jeu</button>
+
+    <script src="https://cervelle.pages.lacl.fr/padiflac/padiflac_runtime.js"></script>
+    <script>
+        // Fonction pour obtenir un identifiant unique pour chaque joueur
+        function getUniqueID() {
+            let id = localStorage.getItem("uniqueID");
+            if (!id) {
+                id = Math.floor(Math.random() * 1000000); // Génération d'un ID aléatoire
+                localStorage.setItem("uniqueID", id);
+            }
+            return id;
+        }
+
+        // Récupération de l'identifiant unique du joueur
+        const playerID = getUniqueID();
+
+        // Connexion au salon de discussion spécifique pour le jeu
+        const connection = Padiflac.connect("32105999007Game");
+
+        // Fonction pour jouer un tour
+        function playTurn() {
+            const action = document.getElementById("action").value;
+
+            // Envoi de l'action au salon de discussion
+            connection.send(`${playerID},${action}`);
+        }
+
+        // Gestionnaire d'événement pour les messages entrants
+        connection.eventloop(function(message) {
+            const [opponentID, opponentAction] = message.split(',');
+
+            // Vérification si l'adversaire a déjà joué
+            if (opponentAction === undefined) {
+                // L'adversaire n'a pas encore joué
+                document.getElementById("playerInfo").innerText = `Joueur ${playerID}`;
+                document.getElementById("gameResult").innerText = "En attente de l'action de l'adversaire...";
+            } else {
+                // L'adversaire a déjà joué
+                if (opponentID !== playerID) {
+                    const playerAction = document.getElementById("action").value;
+
+                    if (opponentAction === "1" && playerAction === "2") {
+                        document.getElementById("gameResult").innerText = "Vous avez perdu !";
+                    } else if (opponentAction === "1" && playerAction !== "2") {
+                        document.getElementById("gameResult").innerText = "Vous avez gagné !";
+                    } else if (opponentAction === "2" && playerAction === "1") {
+                        document.getElementById("gameResult").innerText = "Vous avez perdu !";
+                    } else if (opponentAction === "2" && playerAction === "2") {
+                        document.getElementById("gameResult").innerText = "Les chargeurs sont pleins !";
+                    } else if (opponentAction === "2" && playerAction !== "2") {
+                        document.getElementById("gameResult").innerText = "Les chargeurs sont vides !";
+                    } else {
+                        document.getElementById("gameResult").innerText = "Match nul !";
+                    }
+                }
+
+                // Réinitialisation des actions
+                document.getElementById("action").value = "0";
+            }
+        });
+
+        // Fonction pour réinitialiser l'état du jeu
+        function resetGame() {
+            localStorage.removeItem("playerAction");
+            localStorage.removeItem("opponentAction");
+            document.getElementById("playerInfo").innerText = "";
+            document.getElementById("gameResult").innerText = "";
+            document.getElementById("action").value = "0";
+
+            // Envoi d'un message spécial pour réinitialiser le jeu de l'autre joueur
+            connection.send(`RESET`);
+        }
+    </script>
+</body>
+</html>

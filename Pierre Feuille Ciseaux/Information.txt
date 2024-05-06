@@ -1,0 +1,1 @@
+Un jeu de shi-fu-mi. La partie se joue en dix manches. À chaque manche, le joueur choisit entre feuille, ciseaux, pierre et puits et l'ordinateur en fait de même (il choisira au hasard).

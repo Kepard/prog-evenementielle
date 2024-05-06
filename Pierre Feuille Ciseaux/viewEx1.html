@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shi-Fu-Mi</title>
+  <link rel="stylesheet" href="stylesEx1.css">
+</head>
+<body>
+  <div id="score">
+    <h2>Score</h2>
+    <p>Joueur : <span id="playerScore">0</span></p>
+    <p>Ordinateur : <span id="computerScore">0</span></p>
+  </div>
+  <div id="round">
+    <h2>Manches restantes</h2>
+    <p><span id="roundsLeft">10</span></p>
+  </div>
+  <div id="actions">
+    <button onclick="play('feuille')">Feuille</button>
+    <button onclick="play('ciseaux')">Ciseaux</button>
+    <button onclick="play('pierre')">Pierre</button>
+    <button onclick="play('puits')">Puits</button>
+  </div>
+  <button id="restartButton" onclick="restart()">Rejouer</button>
+  <script src="controllerEx1.js"></script>
+</body>
+</html>

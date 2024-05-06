@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice 2</title>
+    <style>
+        body {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exercice 2: encheres</h1>
+    <div>
+        <label for="surnom">Surnom :</label>
+        <input type="text" id="surnom">
+    </div>
+    <div>
+        <label for="enchereMax">Prix maximum à dépenser :</label>
+        <input type="number" id="enchereMax">
+        <button onclick="definirEnchere()">Valider</button>
+    </div>
+    <div>
+        <label for="enchereActuelle">Enchère actuelle :</label>
+        <span id="enchereActuelle">0</span>
+    </div>
+
+    <script src="https://cervelle.pages.lacl.fr/padiflac/padiflac_runtime.js"></script>
+    <script>
+        const connection = Padiflac.connect("simone_32105999_001");
+
+        connection.send(`${localStorage.getItem("surnom")}_0`);
+        
+        function definirEnchere() {
+            const surnom = document.getElementById("surnom").value;
+            const enchereMax = parseInt(document.getElementById("enchereMax").value);
+            const enchereActuelle = parseInt(document.getElementById("enchereActuelle").innerText);
+
+            if (surnom.trim() !== "" && !isNaN(enchereMax)) {
+                if (enchereMax > enchereActuelle) {
+                    const nouvelleEnchere = Math.min(enchereMax, enchereActuelle + 1);
+                    connection.send(`${surnom}_${nouvelleEnchere}`);
+                } else {
+                    alert("Votre enchere doit etre superieure a l'enchere en cours");
+                }
+            } else {
+                alert("Saisissez un surnom et une enchere valide");
+            }
+        }
+
+        connection.eventloop(function(message) {
+            const parties = message.split('_');
+            const surnom = parties[0];
+            const enchere = parseInt(parties[1]);
+
+            // si la nouvelle enchere est superieurr a celle en cours
+            const enchereActuelle = parseInt(document.getElementById("enchereActuelle").innerText);
+            if (enchere > enchereActuelle) {
+                document.getElementById("enchereActuelle").innerText = enchere;
+            }
+        });
+    </script>
+</body>
+</html>

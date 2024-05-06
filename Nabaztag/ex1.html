@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice 1</title>
+    <style>
+
+
+        .lapin {
+            width: 200px;
+            height: 200px;
+            background-color: #ffcc6663;
+            position: relative;
+            border-radius: 50%;
+            margin: 0 10%;
+        }
+
+        .oreille-droite {
+            width: 70px;
+            height: 100px;
+            background-color: #ffcc66;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            transform-origin: top right;
+            transform: rotate(0deg);
+            border-radius: 20px;
+            margin: 0 10%;
+        }
+
+        .oreille-gauche {
+            width: 70px;
+            height: 100px;
+            background-color: #ffcc66;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            transform-origin: top left;
+            transform: rotate(0deg);
+            border-radius: 20px;
+            margin: 0 10%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Exercice 1: Nabaztag</h1>
+    <div class="lapin">
+        <div class="oreille-droite"></div>
+        <div class="oreille-gauche"></div>
+    </div>
+    <div>
+        <label for="angleOreilleDroite">Angle oreille droite (0-90 degrés) :</label>
+        <input type="text" id="angleOreilleDroite">
+        <button onclick="changerAngle('R')">Changer</button>
+    </div>
+    <div>
+        <label for="angleOreilleGauche">Angle oreille gauche (0-90 degrés) :</label>
+        <input type="text" id="angleOreilleGauche">
+        <button onclick="changerAngle('L')">Changer</button>
+    </div>
+
+    <script src="https://cervelle.pages.lacl.fr/padiflac/padiflac_runtime.js"></script>
+    <script>
+        const connection = Padiflac.connect("lapin_32105999_001");
+
+        function changerAngle(cote) {
+            let angle;
+            if (cote === 'R') {
+                angle = document.getElementById("angleOreilleDroite").value;
+            } else if (cote === 'L') {
+                angle = document.getElementById("angleOreilleGauche").value;
+            }
+
+            if (!isNaN(angle) && angle >= 0 && angle <= 90) {
+                connection.send(`${cote}${angle}`);
+            } else {
+                alert("L'angle doit etre compris entre 0 et 90");
+            }
+        }
+
+        connection.eventloop(function(message) {
+            const cote = message.charAt(0);
+            const angle = message.slice(1);
+
+            if (cote === 'R') {
+                document.querySelector('.oreille-droite').style.transform = `rotate(${-angle}deg)`;
+                document.getElementById("angleOreilleDroite").value = angle;
+            } else if (cote === 'L') {
+                document.querySelector('.oreille-gauche').style.transform = `rotate(${angle}deg)`;
+                document.getElementById("angleOreilleGauche").value = angle;
+            }
+        });
+    </script>
+</body>
+</html>
